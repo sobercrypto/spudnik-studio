@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head><meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eleven minutes</title>
+<style>
+  html,body{margin:0;background:#07080b;color:#8f8676;font-family:Georgia,"Times New Roman",serif;}
+  body{display:flex;flex-direction:column;align-items:center;min-height:100vh;}
+  .prog{margin:28px 16px 6px;text-align:center;line-height:1.5;letter-spacing:.02em}
+  .prog .t{font-size:22px;color:#c9bda6}
+  .prog .s{font-size:14px;font-style:italic}
+  #wrap{position:relative;width:min(92vw,800px);}
+  canvas{display:block;width:100%;height:auto;}
+  .house{margin:10px 16px 4px;font-size:13px;text-align:center;font-variant-numeric:tabular-nums;color:#6f685d}
+  #note{min-height:1.6em;margin:6px 16px 30px;font-size:14px;font-style:italic;text-align:center;color:#a99f8c;opacity:0;transition:opacity 4s}
+  #strike{display:none;margin:0 0 30px;font-size:12px;color:#5a544b;cursor:pointer;text-decoration:underline;background:none;border:0;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="prog">
+  <div class="t">eleven minutes</div>
+  <div class="s">a play for one potato. a kitchen, night.</div>
+  <div class="s">running time: eleven minutes. they do not have to be consecutive.</div>
+</div>
+<div id="wrap"><canvas id="c" width="800" height="540"></canvas></div>
+<div class="house">unobserved &nbsp;<span id="clock">0:00</span></div>
+<div id="note"></div>
+<button id="strike">strike the set and plant another</button>
+
+<script>
+(function(){
+"use strict";
+var W=800,H=540, RUN=660, RESPECT=420;
+var cv=document.getElementById('c'), cx=cv.getContext('2d');
+var clockEl=document.getElementById('clock'), noteEl=document.getElementById('note'), strikeEl=document.getElementById('strike');
+
+/* ---------- memory (each visitor gets their own potato) ---------- */
+var store={};
+try{ store=JSON.parse(localStorage.getItem('eleven_minutes')||'{}')||{}; }catch(e){ store={}; }
+function save(){ try{ localStorage.setItem('eleven_minutes',JSON.stringify(store)); }catch(e){} }
+if(!store.seed){ store.seed=(Math.random()*4294967295)>>>0; store.unobs=0; store.watched=0; }
+var now=Date.now();
+if(store.last){ store.unobs+=Math.max(0,(now-store.last)/1000); }   // it kept going while you were gone
+store.last=now; save();
+
+/* ---------- seeded randomness ---------- */
+function rng(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+var R, P;
+function plantPotato(seed){
+  R=rng(seed);
+  var p={cx:392+R()*20, cy:338, rx:150+R()*30, ry:96+R()*16, tilt:(R()-.5)*0.22, harm:[]};
+  for(var k=2;k<=6;k++) p.harm.push({k:k, a:(k==2?0.05:0.035/k*2)*(0.4+R()), ph:R()*6.283});
+  p.r=function(th){ var s=1; for(var i=0;i<this.harm.length;i++){var h=this.harm[i]; s+=h.a*Math.cos(h.k*th+h.ph);} return s; };
+  p.pt=function(th,f){ f=f||1; var s=this.r(th)*f, x=Math.cos(th)*this.rx*s, y=Math.sin(th)*this.ry*s;
+    var c=Math.cos(this.tilt), sn=Math.sin(this.tilt); return [this.cx+x*c-y*sn, this.cy+x*sn+y*c]; };
+  // eyes: scattered near the rim, a few on the face
+  p.eyes=[];
+  var n=6+Math.floor(R()*3);
+  for(var i=0;i<n;i++){ var th=R()*6.283, f=0.55+R()*0.38; p.eyes.push({th:th,f:f,sz:3+R()*3,rot:R()*6.283}); }
+  // the waking eye: the one on the upper-right rim, nearest the window
+  p.wake={th:-0.62-R()*0.35, f:0.93, sz:5, rot:0};
+  p.second={th:-1.9-R()*0.4, f:0.9, sz:4, rot:0};
+  p.eyes.push(p.wake,p.second);
+  p.specks=[]; for(var i=0;i<520;i++){ p.specks.push([R()*6.283, Math.sqrt(R())*1.02, R(), R()]); }
+  p.wig=R()*6.283; p.lean=(R()-.5)*0.25;
+  return p;
+}
+P=plantPotato(store.seed);
+
+/* ---------- helpers ---------- */
+function clamp(x,a,b){return x<a?a:x>b?b:x;}
+function sstep(a,b,x){ x=clamp((x-a)/(b-a),0,1); return x*x*(3-2*x); }
+function mix(c1,c2,t){ return 'rgb('+[0,1,2].map(function(i){return Math.round(c1[i]+(c2[i]-c1[i])*t);}).join(',')+')'; }
+function outline(f){ cx.beginPath(); for(var i=0;i<=180;i++){ var q=P.pt(i/180*6.283,f); i?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); } cx.closePath(); }
+var LIGHT=[0.5,-1.0]; // toward the window, offstage, upper right
+
+/* ---------- the set ---------- */
+function drawSet(){
+  // wall
+  var g=cx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#0b0d13'); g.addColorStop(1,'#11131a');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  // window light on the wall
+  var wl=cx.createRadialGradient(W+40,-60,20,W+40,-60,760);
+  wl.addColorStop(0,'rgba(150,170,205,0.20)'); wl.addColorStop(0.55,'rgba(110,125,160,0.06)'); wl.addColorStop(1,'rgba(0,0,0,0)');
+  cx.fillStyle=wl; cx.fillRect(0,0,W,H);
+  // counter
+  var top=392;
+  var cg=cx.createLinearGradient(0,top,0,H); cg.addColorStop(0,'#3a2c20'); cg.addColorStop(0.08,'#2a2018'); cg.addColorStop(1,'#140f0b');
+  cx.fillStyle=cg; cx.fillRect(0,top,W,H-top);
+  // back edge of the counter, a little lip of light
+  cx.fillStyle='rgba(190,170,140,0.10)'; cx.fillRect(0,top,W,1.5);
+  // grain
+  var gr=rng(77);
+  cx.lineWidth=1;
+  for(var i=0;i<46;i++){ var y=top+6+gr()*(H-top-6); cx.strokeStyle='rgba(0,0,0,'+(0.12+gr()*0.15)+')';
+    cx.beginPath(); cx.moveTo(-10,y); for(var x=0;x<=W+10;x+=40){ cx.lineTo(x,y+Math.sin(x*0.011+i)*2*gr()); } cx.stroke(); }
+  // the window's light falling on the counter: a skewed pane with a mullion shadow
+  cx.save();
+  cx.beginPath(); cx.moveTo(470,top); cx.lineTo(W+20,top); cx.lineTo(W+20,H); cx.lineTo(300,H); cx.closePath(); cx.clip();
+  var pg=cx.createLinearGradient(W,top,380,H); pg.addColorStop(0,'rgba(165,185,220,0.16)'); pg.addColorStop(1,'rgba(165,185,220,0.03)');
+  cx.fillStyle=pg; cx.fillRect(0,top,W,H-top);
+  cx.fillStyle='rgba(0,0,0,0.18)'; cx.beginPath(); cx.moveTo(640,top); cx.lineTo(652,top); cx.lineTo(560,H); cx.lineTo(536,H); cx.closePath(); cx.fill();
+  cx.restore();
+}
+
+/* ---------- the potato ---------- */
+function drawPotato(){
+  // shadow on the counter, thrown away from the window
+  cx.save();
+  cx.filter='blur(10px)';
+  cx.fillStyle='rgba(0,0,0,0.55)';
+  cx.beginPath(); cx.ellipse(P.cx-38,P.cy+P.ry*0.86,P.rx*1.05,P.ry*0.30,0,0,6.283); cx.fill();
+  cx.restore();
+  cx.save(); outline(1); cx.clip();
+  // body: lit from upper right
+  var g=cx.createLinearGradient(P.cx+P.rx*0.8,P.cy-P.ry*1.1,P.cx-P.rx*0.9,P.cy+P.ry*1.0);
+  g.addColorStop(0,'#cfae80'); g.addColorStop(0.45,'#9c7a50'); g.addColorStop(1,'#3b2a19');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  var hl=cx.createRadialGradient(P.cx+P.rx*0.38,P.cy-P.ry*0.45,4,P.cx+P.rx*0.38,P.cy-P.ry*0.45,P.rx*0.75);
+  hl.addColorStop(0,'rgba(235,215,180,0.45)'); hl.addColorStop(1,'rgba(235,215,180,0)');
+  cx.fillStyle=hl; cx.fillRect(0,0,W,H);
+  // mottling: big soft patches, no potato is one colour
+  var mr=rng(P.cx*1000|0);
+  for(var i=0;i<14;i++){ var q=P.pt(mr()*6.283,Math.sqrt(mr())*0.9), rad=20+mr()*45, dark=mr()<0.6;
+    var mg=cx.createRadialGradient(q[0],q[1],0,q[0],q[1],rad);
+    mg.addColorStop(0,dark?'rgba(70,45,20,0.16)':'rgba(240,220,180,0.12)'); mg.addColorStop(1,'rgba(0,0,0,0)');
+    cx.fillStyle=mg; cx.fillRect(q[0]-rad,q[1]-rad,rad*2,rad*2); }
+  // skin: lenticels and freckles
+  for(var i=0;i<P.specks.length;i++){ var s=P.specks[i], q=P.pt(s[0],s[1]);
+    cx.fillStyle=s[2]<0.7?'rgba(60,40,22,'+(0.10+s[3]*0.18)+')':'rgba(230,205,160,'+(0.08+s[3]*0.12)+')';
+    cx.beginPath(); cx.arc(q[0],q[1],0.6+s[3]*1.3,0,6.283); cx.fill(); }
+  // a dark rim at the bottom where it sits
+  var rim=cx.createLinearGradient(0,P.cy+P.ry*0.5,0,P.cy+P.ry*1.1); rim.addColorStop(0,'rgba(0,0,0,0)'); rim.addColorStop(1,'rgba(0,0,0,0.45)');
+  cx.fillStyle=rim; cx.fillRect(0,0,W,H);
+  cx.restore();
+  // eyes
+  for(var i=0;i<P.eyes.length;i++){ var e=P.eyes[i], q=P.pt(e.th,e.f), a=Math.atan2(q[1]-P.cy,q[0]-P.cx)+Math.PI/2+e.rot*0.15;
+    cx.save(); cx.translate(q[0],q[1]); cx.rotate(a);
+    cx.strokeStyle='rgba(225,200,160,0.35)'; cx.lineWidth=1.2; cx.beginPath(); cx.arc(0,e.sz*0.6,e.sz*1.25,-2.4,-0.74); cx.stroke(); // brow
+    cx.strokeStyle='rgba(45,28,14,0.85)'; cx.lineWidth=1.6; cx.beginPath(); cx.arc(0,-e.sz*0.2,e.sz*0.8,0.5,2.64); cx.stroke();      // eye
+    cx.restore(); }
+}
+
+/* ---------- the sprout (never while anyone is looking) ---------- */
+function sproutPath(eye,len,aim,wig){
+  var q=P.pt(eye.th,eye.f), nx=q[0]-P.cx, ny=q[1]-P.cy, a0=Math.atan2(ny,nx), aL=Math.atan2(LIGHT[1],LIGHT[0])+aim;
+  var pts=[[q[0],q[1]]], x=q[0], y=q[1];
+  for(var s=1;s<=len;s++){ var a=a0+(aL-a0)*(1-Math.exp(-s/62))+Math.sin(s/19+wig)*0.13*Math.min(1,s/30); x+=Math.cos(a); y+=Math.sin(a); pts.push([x,y,a]); }
+  pts[0][2]=pts.length>1?pts[1][2]:a0;
+  return pts;
+}
+var PALE=[236,226,200], PURPLE=[122,62,118], DEEP=[88,40,86];
+function drawSprout(eye,u,maxLen,scale){
+  var nub=sstep(50,190,u)*8*scale;               // the eye swells first
+  var len=Math.pow(sstep(170,640,u),1.25)*maxLen; // then it reaches
+  var q=P.pt(eye.th,eye.f);
+  if(nub<=0.05) return;
+  var pts=sproutPath(eye,Math.max(1,Math.floor(len)),P.lean*0.6,P.wig);
+  // root initials at the base, late in the play
+  var roots=sstep(380,560,u)*scale;
+  if(roots>0){ var rr=rng(eye.th*1000|0); cx.strokeStyle='rgba(240,232,214,0.75)'; cx.lineCap='round';
+    for(var k=0;k<3;k++){ var ra=pts[0][2]+(k-1)*0.9+Math.PI*0.55+(rr()-.5)*0.4, rl=(4+rr()*7)*roots;
+      cx.lineWidth=1.3*scale; cx.beginPath(); cx.moveTo(q[0],q[1]); cx.quadraticCurveTo(q[0]+Math.cos(ra)*rl*0.6+2,q[1]+Math.sin(ra)*rl*0.6,q[0]+Math.cos(ra)*rl,q[1]+Math.sin(ra)*rl); cx.stroke(); } }
+  // stem: tapered, pale, purpling toward the tip
+  var N=pts.length;
+  for(var i=0;i<N;i++){ var t=N>1?i/(N-1):0, nd=(i%24)-22, w=(nub*0.95)*(1-0.42*t)*(1+0.16*Math.exp(-nd*nd/18));
+    var col=t<0.62?mix(PALE,[214,190,190],t/0.62):mix([214,190,190],PURPLE,(t-0.62)/0.38);
+    cx.fillStyle=col; cx.beginPath(); cx.arc(pts[i][0],pts[i][1],w,0,6.283); cx.fill(); }
+  // light side of the stem
+  cx.fillStyle='rgba(255,250,235,0.35)';
+  for(var i=0;i<N;i+=1){ var t=N>1?i/(N-1):0, w=(nub*0.95)*(1-0.42*t), a=pts[i][2]-Math.PI/2;
+    cx.beginPath(); cx.arc(pts[i][0]+Math.cos(a)*w*0.45,pts[i][1]+Math.sin(a)*w*0.45,w*0.35,0,6.283); cx.fill(); }
+  // scale leaves at the nodes
+  for(var s=22;s<N-8;s+=24){ var p=pts[s], t=s/(N-1), w=(nub*0.95)*(1-0.42*t), side=(s/24)%2?1:-1, a=p[2]+side*1.1;
+    cx.fillStyle=mix([200,170,180],DEEP,t); cx.beginPath();
+    cx.moveTo(p[0]+Math.cos(p[2]+side*1.57)*w*0.8,p[1]+Math.sin(p[2]+side*1.57)*w*0.8);
+    cx.lineTo(p[0]+Math.cos(a)*w*1.5,p[1]+Math.sin(a)*w*1.5);
+    cx.lineTo(p[0]+Math.cos(p[2])*w*1.2,p[1]+Math.sin(p[2])*w*1.2); cx.closePath(); cx.fill(); }
+  // the tip: a little clenched bud, and at the very end of the play, a leaf
+  var tp=pts[N-1], tw=(nub*0.95)*(1-0.42);
+  if(N>3){ cx.fillStyle=mix(PURPLE,DEEP,0.5); cx.beginPath(); cx.ellipse(tp[0],tp[1],tw*1.25,tw*0.95,tp[2],0,6.283); cx.fill(); }
+  var leaf=sstep(560,655,u)*scale;
+  if(leaf>0 && N>10){ var la=tp[2]-0.7, L=22*leaf;
+    cx.save(); cx.translate(tp[0],tp[1]); cx.rotate(la);
+    cx.fillStyle='rgb(120,138,92)'; cx.beginPath(); cx.moveTo(0,0); cx.quadraticCurveTo(L*0.5,-L*0.45,L,0); cx.quadraticCurveTo(L*0.5,L*0.25,0,0); cx.fill();
+    cx.strokeStyle='rgba(60,70,40,0.6)'; cx.lineWidth=0.7; cx.beginPath(); cx.moveTo(0,0); cx.lineTo(L*0.9,-L*0.03); cx.stroke();
+    cx.restore(); }
+}
+
+/* ---------- dust in the window light: the only thing allowed to move while you watch ---------- */
+var dust=[]; (function(){ var d=rng(9); for(var i=0;i<38;i++) dust.push({x:380+d()*440,y:d()*380,v:0.04+d()*0.09,ph:d()*6.283,r:0.5+d()*1.1,a:0.05+d()*0.16}); })();
+function drawDust(t){
+  for(var i=0;i<dust.length;i++){ var m=dust[i]; var y=(m.y+t*m.v*0.02)%400, x=m.x+Math.sin(t*0.0002+m.ph)*14-(y*0.35);
+    var inBeam=clamp(1-(Math.abs((x-(W+40))*0.62+(y+60))/420),0,1);
+    cx.fillStyle='rgba(200,210,230,'+(m.a*inBeam)+')'; cx.beginPath(); cx.arc(x,y,m.r,0,6.283); cx.fill(); }
+}
+
+/* ---------- show ---------- */
+var lights=0;          // 0 = dark house, 1 = full stage light
+var lightsT0=performance.now();
+var visible=!document.hidden, hiddenAt=null, watchT=performance.now();
+function frame(t){
+  if(document.hidden){ requestAnimationFrame(frame); return; }
+  var dt=(t-watchT)/1000; watchT=t;
+  if(dt>0 && dt<1.5){ store.watched+=dt; }   // only count the looking you actually did
+  store.last=Date.now();
+  var u=Math.min(store.unobs,RUN);
+  lights=sstep(0,2600,t-lightsT0);
+  drawSet(); drawDust(t); drawPotato();
+  drawSprout(P.second,Math.max(0,u-250),18,0.55);
+  drawSprout(P.wake,u,124,1);
+  if(lights<1){ cx.fillStyle='rgba(3,3,5,'+(1-lights)+')'; cx.fillRect(0,0,W,H); }
+  var s=Math.floor(u), mm=Math.floor(s/60), ss=s%60; clockEl.textContent=mm+':'+(ss<10?'0':'')+ss;
+  if(u>=RUN){ say('curtain.'); strikeEl.style.display='inline-block'; }
+  else if(store.watched>=RESPECT){ say('around minute seven, the audience begins to respect it.'); }
+  requestAnimationFrame(frame);
+}
+var said='';
+function say(s){ if(said===s) return; said=s; noteEl.style.opacity=0; setTimeout(function(){ noteEl.textContent=s; noteEl.style.opacity=1; },noteEl.textContent?600:0); }
+
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden){ hiddenAt=Date.now(); store.last=hiddenAt; save(); }
+  else{
+    if(hiddenAt!==null){ store.unobs+=(Date.now()-hiddenAt)/1000; hiddenAt=null; }
+    store.last=Date.now(); save();
+    lightsT0=performance.now(); watchT=performance.now();   // house lights come back up
+  }
+});
+window.addEventListener('pagehide',function(){ store.last=Date.now(); save(); });
+setInterval(function(){ if(!document.hidden){ store.last=Date.now(); save(); } },2000);
+strikeEl.addEventListener('click',function(){
+  store={seed:(Math.random()*4294967295)>>>0,unobs:0,watched:0,last:Date.now()}; save();
+  P=plantPotato(store.seed); said=''; noteEl.style.opacity=0; strikeEl.style.display='none'; lightsT0=performance.now();
+});
+
+// for the stage manager only
+window.__rehearse=function(u,w,seed){ if(seed) { store.seed=seed; P=plantPotato(seed);} store.unobs=u; store.watched=w||0; lightsT0=-1e9; };
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
