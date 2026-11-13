@@ -14,19 +14,67 @@
   canvas{display:block;width:100%;height:auto;}
   .house{margin:10px 16px 4px;font-size:13px;text-align:center;font-variant-numeric:tabular-nums;color:#6f685d}
   #note{min-height:1.6em;margin:6px 16px 30px;font-size:14px;font-style:italic;text-align:center;color:#a99f8c;opacity:0;transition:opacity 4s}
+  #hint{min-height:1.4em;margin:2px 16px 0;font-size:12px;font-style:italic;text-align:center;color:#5f584d;opacity:0;transition:opacity 3s}
+  #inter{color:#8a8070;transition:opacity 3s}
+  #progbtn{margin:0 0 30px;font-size:12px;color:#5a544b;cursor:pointer;text-decoration:underline;background:none;border:0;font-family:inherit}
+  #door{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(4,4,6,.95);overflow-y:auto;z-index:5;transition:opacity 1.4s}
+  #door.gone{opacity:0;pointer-events:none}
+  .card{margin:6vh auto 7vh;width:calc(100% - 28px);max-width:390px;box-sizing:border-box;background:#e7dec8;color:#2b241b;padding:30px 28px 22px;
+    box-shadow:0 18px 50px rgba(0,0,0,.65), inset 0 0 60px rgba(120,95,55,.22);transform:rotate(-.7deg);font-size:14.5px;line-height:1.55}
+  .card .pres{text-align:center;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#6b5d48}
+  .card h1{font-weight:normal;font-size:31px;margin:6px 0 0;text-align:center;letter-spacing:.02em}
+  .card .sub{text-align:center;font-style:italic;color:#4b3f30}
+  .card .big{text-align:center;font-size:17.5px;font-style:italic;margin:18px 0 4px}
+  .card h2{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;font-weight:normal;text-align:center;margin:20px 0 10px;color:#5a4c38;border-top:1px solid #b6a98e;padding-top:15px}
+  .card p{margin:0 0 9px}
+  .scenes{list-style:none;padding:0;margin:0}
+  .scenes li{display:flex;align-items:baseline;gap:7px;margin:0 0 3px}
+  .scenes li i{flex:1;border-bottom:1px dotted #8f8069;min-width:12px}
+  .card .fine{font-size:12px;color:#6b5d48;text-align:center;font-style:italic;margin-top:10px}
+  .card .seat{display:block;margin:18px auto 6px;background:none;border:1px solid #4a3e2e;color:#2b241b;font-family:inherit;font-size:14px;padding:8px 20px;cursor:pointer;letter-spacing:.04em}
+  .card .seat:hover{background:#2b241b;color:#e7dec8}
   #strike{display:none;margin:0 0 30px;font-size:12px;color:#5a544b;cursor:pointer;text-decoration:underline;background:none;border:0;font-family:inherit}
 </style>
 </head>
 <body>
+<div id="door" role="dialog" aria-label="the program">
+ <div class="card">
+  <div class="pres">the kitchen, after hours, presents</div>
+  <h1>eleven minutes</h1>
+  <div class="sub">a play for one potato</div>
+  <div class="big">please do not watch the potato.</div>
+  <h2>house rules</h2>
+  <p>the potato performs only for an empty house. switch tabs, close the laptop, go to bed. come back whenever you like.</p>
+  <p>the clock under the stage counts the time it has spent alone. if it says 0:00, you have been watching the whole time. most people do. nobody is blaming you.</p>
+  <p>when you return, the house lights come up on whatever happened while you were out.</p>
+  <p>the eleven minutes do not have to be consecutive. it will wait a week.</p>
+  <p>your potato lives in this browser. another device seats you at another performance.</p>
+  <h2>order of events</h2>
+  <ul class="scenes">
+   <li>an eye begins to swell<i></i>around 1:30</li>
+   <li>something reaches for the window<i></i>4:30</li>
+   <li>roots<i></i>7:00</li>
+   <li>a leaf<i></i>10:00</li>
+   <li>curtain<i></i>11:00</li>
+  </ul>
+  <p class="fine">times are approximate. nobody has ever seen any of it happen.</p>
+  <h2>a note on the form</h2>
+  <p>mark calls this <em>quantum theater</em>: it only unfolds while nobody's sure what it's doing, and it settles the moment you look. the phrase is his. the potato has not been told.</p>
+  <p class="fine">the curtain stays down while you read this. it already counts.</p>
+  <button class="seat" id="seat">take your seat</button>
+ </div>
+</div>
 <div class="prog">
   <div class="t">eleven minutes</div>
   <div class="s">a play for one potato. a kitchen, night.</div>
   <div class="s">running time: eleven minutes. they do not have to be consecutive.</div>
 </div>
 <div id="wrap"><canvas id="c" width="800" height="540"></canvas></div>
-<div class="house">unobserved &nbsp;<span id="clock">0:00</span></div>
+<div class="house">unobserved &nbsp;<span id="clock">0:00</span><span id="inter"></span></div>
+<div id="hint">(it is waiting for you to leave)</div>
 <div id="note"></div>
 <button id="strike">strike the set and plant another</button>
+<button id="progbtn">the program</button>
 
 <script>
 (function(){
@@ -40,8 +88,8 @@ var store={};
 try{ store=JSON.parse(localStorage.getItem('eleven_minutes')||'{}')||{}; }catch(e){ store={}; }
 function save(){ try{ localStorage.setItem('eleven_minutes',JSON.stringify(store)); }catch(e){} }
 if(!store.seed){ store.seed=(Math.random()*4294967295)>>>0; store.unobs=0; store.watched=0; }
-var now=Date.now();
-if(store.last){ store.unobs+=Math.max(0,(now-store.last)/1000); }   // it kept going while you were gone
+var now=Date.now(), goneOnLoad=0;
+if(store.last){ goneOnLoad=Math.max(0,(now-store.last)/1000); store.unobs+=goneOnLoad; }   // it kept going while you were gone
 store.last=now; save();
 
 /* ---------- seeded randomness ---------- */
@@ -199,11 +247,35 @@ function drawDust(t){
 /* ---------- show ---------- */
 var lights=0;          // 0 = dark house, 1 = full stage light
 var lightsT0=performance.now();
-var visible=!document.hidden, hiddenAt=null, watchT=performance.now();
+var watchT=performance.now(), staredFor=0;
+var door=document.getElementById('door'), hintEl=document.getElementById('hint'), interEl=document.getElementById('inter');
+var programOpen=!store.seated;          // first visit: the program is handed to you at the door
+if(!programOpen) door.className='gone';
+
+/* away = tab hidden OR the curtain is down for the program. nobody is watching either way. */
+var awayAt=null, awayStart=null;
+function isAway(){ return document.hidden || programOpen; }
+function commit(){ var n=Date.now(); if(awayAt!==null){ store.unobs+=Math.max(0,(n-awayAt)/1000); awayAt=n; } store.last=n; save(); }
+function goAway(){ if(awayAt===null){ awayAt=Date.now(); awayStart=awayAt; } commit(); }
+function comeBack(){
+  if(isAway()) return;
+  commit();
+  var gone=awayStart!==null?(Date.now()-awayStart)/1000:0;
+  awayAt=null; awayStart=null;
+  lightsT0=performance.now(); watchT=performance.now(); staredFor=0;   // house lights come back up
+  if(gone>=5) intermission(gone);
+}
+function fmt(sec){ var s=Math.floor(sec); if(s>=3600){ var h=Math.floor(s/3600), m=Math.floor(s%3600/60); return h+'h '+(m<10?'0':'')+m+'m'; } var mm=Math.floor(s/60), ss=s%60; return mm+':'+(ss<10?'0':'')+ss; }
+var interTimer=null;
+function intermission(sec){
+  interEl.innerHTML=' &nbsp;&middot;&nbsp; intermission '+fmt(sec); interEl.style.opacity=1;
+  clearTimeout(interTimer); interTimer=setTimeout(function(){ interEl.style.opacity=0; },30000);
+}
+
 function frame(t){
-  if(document.hidden){ requestAnimationFrame(frame); return; }
+  if(isAway()){ requestAnimationFrame(frame); return; }
   var dt=(t-watchT)/1000; watchT=t;
-  if(dt>0 && dt<1.5){ store.watched+=dt; }   // only count the looking you actually did
+  if(dt>0 && dt<1.5){ store.watched+=dt; staredFor+=dt; }   // only count the looking you actually did
   store.last=Date.now();
   var u=Math.min(store.unobs,RUN);
   lights=sstep(0,2600,t-lightsT0);
@@ -211,7 +283,8 @@ function frame(t){
   drawSprout(P.second,Math.max(0,u-250),18,0.55);
   drawSprout(P.wake,u,124,1);
   if(lights<1){ cx.fillStyle='rgba(3,3,5,'+(1-lights)+')'; cx.fillRect(0,0,W,H); }
-  var s=Math.floor(u), mm=Math.floor(s/60), ss=s%60; clockEl.textContent=mm+':'+(ss<10?'0':'')+ss;
+  clockEl.textContent=fmt(u);
+  hintEl.style.opacity=(u<60 && staredFor>20)?1:0;          // nothing visible has happened yet, and you're still here
   if(u>=RUN){ say('curtain.'); strikeEl.style.display='inline-block'; }
   else if(store.watched>=RESPECT){ say('around minute seven, the audience begins to respect it.'); }
   requestAnimationFrame(frame);
@@ -219,23 +292,27 @@ function frame(t){
 var said='';
 function say(s){ if(said===s) return; said=s; noteEl.style.opacity=0; setTimeout(function(){ noteEl.textContent=s; noteEl.style.opacity=1; },noteEl.textContent?600:0); }
 
-document.addEventListener('visibilitychange',function(){
-  if(document.hidden){ hiddenAt=Date.now(); store.last=hiddenAt; save(); }
-  else{
-    if(hiddenAt!==null){ store.unobs+=(Date.now()-hiddenAt)/1000; hiddenAt=null; }
-    store.last=Date.now(); save();
-    lightsT0=performance.now(); watchT=performance.now();   // house lights come back up
-  }
+document.addEventListener('visibilitychange',function(){ if(document.hidden) goAway(); else comeBack(); });
+window.addEventListener('pagehide',function(){ commit(); });
+setInterval(commit,2000);
+document.getElementById('seat').addEventListener('click',function(){
+  var first=!store.seated; programOpen=false; store.seated=true; door.className='gone';
+  // reading the program the first time isn't an intermission, unless you'd been here before the program existed
+  if(first) awayStart=(goneOnLoad>=5 && awayStart!==null)? awayStart-goneOnLoad*1000 : null;
+  comeBack();
 });
-window.addEventListener('pagehide',function(){ store.last=Date.now(); save(); });
-setInterval(function(){ if(!document.hidden){ store.last=Date.now(); save(); } },2000);
+document.getElementById('progbtn').addEventListener('click',function(){
+  programOpen=true; door.className=''; door.scrollTop=0; goAway();
+});
 strikeEl.addEventListener('click',function(){
-  store={seed:(Math.random()*4294967295)>>>0,unobs:0,watched:0,last:Date.now()}; save();
-  P=plantPotato(store.seed); said=''; noteEl.style.opacity=0; strikeEl.style.display='none'; lightsT0=performance.now();
+  store={seed:(Math.random()*4294967295)>>>0,unobs:0,watched:0,last:Date.now(),seated:true}; save();
+  P=plantPotato(store.seed); said=''; noteEl.style.opacity=0; strikeEl.style.display='none'; lightsT0=performance.now(); staredFor=0;
 });
+if(isAway()) goAway();
+else if(goneOnLoad>=5) intermission(goneOnLoad);
 
 // for the stage manager only
-window.__rehearse=function(u,w,seed){ if(seed) { store.seed=seed; P=plantPotato(seed);} store.unobs=u; store.watched=w||0; lightsT0=-1e9; };
+window.__rehearse=function(u,w,seed){ if(seed) { store.seed=seed; P=plantPotato(seed);} programOpen=false; door.className='gone'; awayAt=null; awayStart=null; store.unobs=u; store.watched=w||0; lightsT0=-1e9; };
 requestAnimationFrame(frame);
 })();
 </script>
