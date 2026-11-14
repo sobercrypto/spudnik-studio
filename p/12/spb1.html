@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head><meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Form SPB-1 · Petition for a Surfacing</title>
+<style>
+:root{--ink:#1f1b16;--paper:#f1ead6;--rule:#b8ad94;--red:#a3301d;--soil:#5a3e26;--pen:#233a78}
+*{box-sizing:border-box}
+html{background:#362d25}
+body{margin:0;font-family:Georgia,"Times New Roman",serif;color:var(--ink);line-height:1.35}
+.sheet{max-width:760px;margin:26px auto 40px;padding:30px 38px 34px;position:relative;
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(circle at 88% 96%, rgba(92,62,36,.035) 0 34px, rgba(92,62,36,.10) 37px, rgba(92,62,36,.30) 39px, rgba(0,0,0,0) 40.5px),
+    radial-gradient(circle at 87.3% 95.2%, rgba(0,0,0,0) 0 38px, rgba(92,62,36,.14) 39.5px, rgba(0,0,0,0) 41px),
+    radial-gradient(circle at 6% 3%, rgba(92,62,36,.10), rgba(0,0,0,0) 60px),
+    linear-gradient(to bottom, rgba(0,0,0,0) 49.7%, rgba(0,0,0,.05) 50%, rgba(255,255,255,.25) 50.3%, rgba(0,0,0,0) 50.6%);
+  box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply}
+.top{display:flex;gap:18px;justify-content:space-between;align-items:flex-start}
+.org{font-variant:small-caps;letter-spacing:.08em;font-size:13px}
+h1{font-size:30px;margin:6px 0 0;letter-spacing:.02em}
+h1 small{display:block;font-size:15px;font-weight:normal;font-style:italic;margin-top:2px}
+.formno{font-family:"Courier New",monospace;font-size:12px;margin-top:6px}
+.office{border:1.5px solid var(--ink);padding:6px 8px;font-size:11px;min-width:190px;font-variant:small-caps;letter-spacing:.05em}
+.office div{display:flex;gap:6px;margin:3px 0;align-items:baseline}
+.office span.v{flex:1;border-bottom:1px solid var(--ink);min-height:15px;font-variant:normal;letter-spacing:0;
+  font-family:"Segoe Script","Bradley Hand","Comic Sans MS",cursive;color:var(--pen);font-size:14px;text-align:center}
+.intro{margin:14px 0 6px;font-size:15px;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);padding:7px 0}
+.sec{margin-top:18px}
+.sh{background:var(--ink);color:var(--paper);font-variant:small-caps;letter-spacing:.1em;font-size:14px;padding:3px 9px}
+.row{display:grid;grid-template-columns:38px 1fr;gap:4px 8px;padding:9px 0 8px;border-bottom:1px dotted var(--rule)}
+.n{font-family:"Courier New",monospace;font-size:13px;padding-top:2px}
+.q{font-size:15.5px}
+.hint{font-size:12.5px;font-style:italic;color:#5b5346}
+input[type=text],input[type=number],textarea{font-family:"Courier New",monospace;font-size:17px;color:var(--pen);
+  background:transparent;border:none;border-bottom:1px solid var(--ink);outline:none;padding:3px 2px;width:100%}
+textarea{border:1px solid var(--ink);resize:none;height:64px;background:rgba(255,255,255,.25)}
+input[type=number]{width:120px}
+label.opt{display:block;margin:3px 0;font-size:15px;cursor:pointer}
+input[type=radio],input[type=checkbox]{accent-color:var(--pen);transform:scale(1.15);margin-right:7px}
+.breath{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:12px;font-variant:small-caps;letter-spacing:.05em}
+.lung{flex:0 0 160px;height:8px;border:1px solid var(--ink);position:relative}
+.lung i{position:absolute;left:0;top:0;bottom:0;background:#6d8fb5;width:100%;transition:width .15s}
+textarea.out{background:rgba(109,143,181,.12)}
+.slider{display:flex;align-items:center;gap:10px;font-size:13px;font-style:italic;flex-wrap:wrap}
+.slider input{flex:1;min-width:140px;accent-color:var(--soil)}
+.locked label{cursor:not-allowed}
+.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.aside{font-size:12.5px;font-style:italic;color:var(--red);min-height:16px;margin-top:3px}
+/* captcha */
+.cap{border:1px solid #c9c2b0;background:#faf8f1;display:inline-flex;align-items:center;gap:12px;padding:12px 16px;margin-top:4px;
+  font-family:Arial,Helvetica,sans-serif;font-size:15px;box-shadow:0 1px 2px rgba(0,0,0,.15);min-width:290px}
+.cbox{width:26px;height:26px;border:2px solid #b5ad9a;border-radius:2px;background:#fff;cursor:pointer;display:grid;place-items:center}
+.cbox.spin{border-radius:50%;border-color:#c9b48a #c9b48a #c9b48a #5a3e26;animation:spin .8s linear infinite}
+.cbox.ok{border:none;background:none;color:#3c7a3a;font-size:28px;font-weight:bold}
+@keyframes spin{to{transform:rotate(360deg)}}
+.capmark{margin-left:auto;font-size:10px;color:#8a8270;text-align:center;line-height:1.2}
+.chal{margin-top:8px;border:1px solid #c9c2b0;background:#fff;padding:10px;max-width:340px;font-family:Arial,Helvetica,sans-serif;display:none}
+.chal .ask{background:#5a3e26;color:#fff;padding:10px 12px;font-size:14px}
+.chal .ask b{display:block;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:6px 0}
+.tile{position:relative;cursor:pointer;background:#e9e2cf}
+.tile canvas{display:block;width:100%;height:auto;transition:transform .12s}
+.tile.sel canvas{transform:scale(.84)}
+.tile.sel::after{content:"\2713";position:absolute;left:4px;top:4px;width:20px;height:20px;border-radius:50%;
+  background:#2c6fbb;color:#fff;font-size:13px;display:grid;place-items:center}
+.chal .bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#a3301d;gap:8px}
+.chal button{background:#2c6fbb;color:#fff;border:none;padding:9px 18px;font-weight:bold;cursor:pointer;border-radius:2px}
+/* signatures */
+.sigs{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px}
+.sigbox{border-bottom:1.5px solid var(--ink);height:110px;position:relative;background:rgba(255,255,255,.18)}
+.sigbox canvas{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.siglab{font-size:12px;font-variant:small-caps;letter-spacing:.06em;margin-top:4px;display:flex;justify-content:space-between}
+.siglab a{font-variant:normal;letter-spacing:0;font-style:italic;color:var(--pen);cursor:pointer}
+#wit{display:flex;align-items:center;justify-content:center;text-align:center;font-size:13.5px;font-style:italic;color:#4b4438;padding:8px;touch-action:none;user-select:none;-webkit-user-select:none}
+#wit.armed{animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{50%{background:rgba(90,62,38,.07)}}
+.potsig{font-family:"Segoe Script","Bradley Hand","Brush Script MT",cursive;font-style:normal;font-size:30px;color:var(--pen);
+  transform:rotate(-6deg);white-space:nowrap;overflow:hidden;max-width:100%;letter-spacing:-1px}
+#witprint{position:absolute;inset:0;pointer-events:none}
+.submit{margin-top:22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.submit button{font-family:Georgia,serif;font-size:17px;background:var(--ink);color:var(--paper);border:none;padding:11px 22px;cursor:pointer;letter-spacing:.04em}
+.errs{color:var(--red);font-style:italic;font-size:14px}
+.fine{margin-top:22px;font-size:11px;color:#5b5346;border-top:1px solid var(--ink);padding-top:6px}
+/* tube + covenant */
+#tube{display:none;max-width:760px;margin:0 auto 20px;font-family:"Courier New",monospace;color:#e9dfc6;font-size:15px;padding:0 38px;min-height:20px}
+#tube div{opacity:0;animation:fadein .4s forwards}
+@keyframes fadein{to{opacity:1}}
+.cov{display:none;background-color:#efe4c4}
+.cov h2{text-align:center;font-size:25px;margin:4px 0 2px;letter-spacing:.06em;font-variant:small-caps}
+.cov .cno{text-align:center;font-family:"Courier New",monospace;font-size:13px}
+.cov p{font-size:15.5px;margin:9px 0}
+.cov ol{padding-left:22px;font-size:15.5px}
+.cov ol li{margin:7px 0}
+.cov .pen{font-family:"Courier New",monospace;color:var(--pen);font-size:16px}
+.covsigs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:16px;align-items:end}
+.covsigs > div{border-bottom:1.5px solid var(--ink);height:76px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.covsigs img{max-height:72px;max-width:100%}
+.covlab{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;font-size:12px;font-variant:small-caps;letter-spacing:.06em;text-align:center}
+.stamp{position:absolute;right:52px;top:292px;color:var(--red);border:4px double var(--red);padding:4px 14px;font-size:30px;
+  font-weight:bold;letter-spacing:.14em;transform:rotate(-11deg) scale(1.7);opacity:0;mix-blend-mode:multiply;font-family:"Courier New",monospace}
+.stamp.down{animation:stampdown .22s ease-in forwards}
+@keyframes stampdown{to{transform:rotate(-11deg) scale(1);opacity:.78}}
+#burrow{display:block;width:100%;max-width:560px;margin:18px auto 0}
+.after{text-align:center;font-style:italic;font-size:17px;min-height:46px;margin-top:4px}
+.again{text-align:center;margin-top:10px;display:none}
+.again button{font-family:Georgia,serif;background:none;border:1px solid var(--ink);padding:6px 14px;cursor:pointer}
+@media (max-width:600px){
+  .sheet{padding:22px 16px 26px;margin:0 0 20px}
+  .top{flex-direction:column}
+  .office{width:100%}
+  h1{font-size:24px}
+  .sigs{grid-template-columns:1fr}
+  .row{grid-template-columns:30px 1fr}
+  .stamp{right:14px;top:auto;bottom:330px;font-size:22px}
+  .covsigs,.covlab{gap:6px}
+  #tube{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="sheet" id="form">
+  <canvas class="grain" id="grain"></canvas>
+  <div class="top">
+    <div>
+      <div class="org">The Russet Nexus &middot; Office of the Sacred Gopher &middot; Lower Burrow</div>
+      <h1>Petition for a Surfacing<small>a legally binding potato covenant</small></h1>
+      <div class="formno">FORM SPB-1 &nbsp;rev. 9 &nbsp;(supersedes rev. 8, which was eaten)</div>
+    </div>
+    <div class="office">
+      <div style="justify-content:center;font-weight:bold">for office use only</div>
+      <div>received <span class="v" id="o_rec"></span></div>
+      <div>tube <span class="v" id="o_tube"></span></div>
+      <div>mood of gopher <span class="v" id="o_mood"></span></div>
+    </div>
+  </div>
+
+  <div class="intro">Sacred Spudbert will not surface without a covenant. He has tenure. Please write clearly; he reads with his whiskers.</div>
+
+  <div class="sec">
+    <div class="sh">Section 1 &nbsp;&middot;&nbsp; The petitioner</div>
+    <div class="row"><div class="n">1.1</div><div><div class="q">Full name</div><input type="text" id="name" maxlength="60" autocomplete="off"></div></div>
+    <div class="row"><div class="n">1.2</div><div><div class="q">What the potatoes call you</div>
+      <input type="text" id="alias" maxlength="60" autocomplete="off">
+      <div class="hint">Leave blank if you don't know. They do.</div></div></div>
+    <div class="row"><div class="n">1.3</div><div><div class="q">Have you ever been, or been mistaken for, a cauliflower?</div>
+      <label class="opt"><input type="radio" name="cauli" value="no" checked>No</label>
+      <label class="opt"><input type="radio" name="cauli" value="nk">Not knowingly</label>
+      <label class="opt"><input type="radio" name="cauli" value="turnip">I wish to speak to a turnip</label></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">Section 2 &nbsp;&middot;&nbsp; The matter</div>
+    <div class="row"><div class="n">2.1</div><div><div class="q">Why do you need the gopher?</div>
+      <label class="opt"><input type="radio" name="why" value="field" checked>To bless a field</label>
+      <label class="opt"><input type="radio" name="why" value="small">To bless a smaller thing (a pot plant, a sock drawer, a car)</label>
+      <label class="opt"><input type="radio" name="why" value="people">To settle a dispute between two people who both think they're right</label>
+      <label class="opt"><input type="radio" name="why" value="potatoes">To settle a dispute between two potatoes</label>
+      <label class="opt"><input type="radio" name="why" value="lost">I lost something underground</label>
+      <label class="opt"><input type="radio" name="why" value="link">I don't know who this is, someone sent me a link</label></div></div>
+    <div class="row"><div class="n">2.2</div><div><div class="q">Describe the matter in one breath.</div>
+      <textarea id="breath" maxlength="120"></textarea>
+      <div class="breath"><span>breath remaining</span><div class="lung"><i id="lung"></i></div><span id="breathmsg"></span></div></div></div>
+    <div class="row"><div class="n">2.3</div><div><div class="q">How urgent is it?</div>
+      <div class="slider"><span>by spring</span><input type="range" id="urg" min="0" max="100" value="30"><span>by spring, but I'll be upset</span></div></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">Section 3 &nbsp;&middot;&nbsp; The offering</div>
+    <div class="row"><div class="n">3.1</div><div><div class="q">Compost offered (kg)</div>
+      <input type="number" id="kg" min="0" max="99999" value="4">
+      <div class="aside" id="kgmsg"></div></div></div>
+    <div class="row locked"><div class="n">3.2</div><div><div class="q">The gopher will also require:</div>
+      <label class="opt"><input type="checkbox" class="lock" checked>One (1) raw potato, unwashed</label>
+      <label class="opt"><input type="checkbox" class="lock" checked>Silence during the surfacing</label>
+      <label class="opt"><input type="checkbox" class="lock" checked>That nobody mentions the other gopher</label>
+      <div class="aside" id="lockmsg"></div></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">Section 4 &nbsp;&middot;&nbsp; Acknowledgements</div>
+    <div class="row"><div class="n">4.1</div><div><label class="opt"><input type="checkbox" id="a1">I understand that Sacred Spudbert has tenure, and cannot be fired, transferred, or asked to "circle back."</label></div></div>
+    <div class="row"><div class="n">4.2</div><div><label class="opt"><input type="checkbox" id="a2">I understand that the vestments are real.</label></div></div>
+    <div class="row"><div class="n">4.3</div><div><label class="opt"><input type="checkbox" id="a3">I understand that if he surfaces, looks at me, and goes back down, that was the blessing.</label></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">Section 5 &nbsp;&middot;&nbsp; Verification</div>
+    <div class="row"><div class="n">5.1</div><div>
+      <div class="cap"><div class="cbox" id="cbox"></div><span id="caplabel">I am not a cauliflower</span>
+        <div class="capmark">&#9673;<br>tuberCAPTCHA<br>privacy &middot; soil</div></div>
+      <div class="chal" id="chal">
+        <div class="ask">Select all squares containing<b>a potato</b></div>
+        <div class="grid" id="grid"></div>
+        <div class="bar"><span id="capmsg"></span><button type="button" id="verify">VERIFY</button></div>
+      </div></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">Section 6 &nbsp;&middot;&nbsp; Signatures</div>
+    <div class="sigs">
+      <div>
+        <div class="sigbox"><canvas id="sig"></canvas></div>
+        <div class="siglab"><span>6.1 &nbsp;petitioner</span><a id="sigclear">start over</a></div>
+      </div>
+      <div>
+        <div class="sigbox" id="wit"><span id="witmsg">Place the potato on your keyboard.<br>(On a phone: press it flat against this box.)</span><canvas id="witprint"></canvas></div>
+        <div class="siglab"><span>6.2 &nbsp;witness (must be a potato)</span><a id="office">I don't have a potato</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="submit"><button type="button" id="send">Send down the tube</button><div class="errs" id="errs"></div></div>
+
+  <div class="fine">Lost forms are composted and come back as slightly better forms. The Office does not accept money and never has. Office hours: whenever the soil is warm.</div>
+</div>
+
+<div id="tube"></div>
+
+<div class="sheet cov" id="cov">
+  <div class="stamp" id="stamp">GRANTED</div>
+  <div class="org" style="text-align:center">The Russet Nexus &middot; Office of the Sacred Gopher &middot; Lower Burrow</div>
+  <h2>Covenant</h2>
+  <div class="cno" id="cno"></div>
+  <p id="parties"></p>
+  <ol id="clauses"></ol>
+  <p style="font-size:14px;font-style:italic">This covenant binds both parties, and the potato that witnessed it.</p>
+  <div class="covsigs"><div id="cs1"></div><div id="cs2"></div><div id="cs3"></div></div>
+  <div class="covlab"><span>the petitioner</span><span>witness (a potato)</span><span>the gopher, his mark</span></div>
+  <canvas id="burrow"></canvas>
+  <div class="after" id="after"></div>
+  <div class="again" id="again"><button type="button" onclick="location.reload()">file another</button></div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const FAST = /fast/.test(location.search) ? 0.04 : 1;
+const wait = ms => new Promise(r=>setTimeout(r, ms*FAST));
+function rng(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* paper grain */
+(function(){const c=$('#grain'),s=$('#form');c.width=380;c.height=520;const x=c.getContext('2d');const im=x.createImageData(380,520);const r=rng(7);
+ for(let i=0;i<im.data.length;i+=4){const v=200+r()*55|0;im.data[i]=v;im.data[i+1]=v-4;im.data[i+2]=v-14;im.data[i+3]=r()<.5?18:0}
+ x.putImageData(im,0,0);c.style.width='100%';c.style.height='100%';})();
+
+/* 2.2 one breath */
+const breath=$('#breath');
+function lung(){const left=120-breath.value.length;$('#lung').style.width=(left/1.2)+'%';
+  $('#breathmsg').textContent=left<=0?'out of breath.':'';breath.classList.toggle('out',left<=0)}
+breath.addEventListener('input',lung);lung();
+
+/* 3.1 compost */
+$('#kg').addEventListener('input',()=>{const k=+$('#kg').value;let m='';
+  if(k<=0)m='Noted. (He will notice.)';else if(k<1)m="That's a handful.";else if(k>=1000)m='Where will he put it. (He is touched.)';
+  $('#kgmsg').textContent=m});
+
+/* 3.2 locked */
+$$('.lock').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();const l=b.parentElement;l.classList.remove('shake');void l.offsetWidth;l.classList.add('shake');
+  $('#lockmsg').textContent="These aren't optional. The boxes are there so you feel involved."}));
+
+/* 5 captcha */
+let capOK=false, cauliIdx=0, capSeed=1;
+const VAR=[['#7d5130','#a8743f'],['#c09a45','#e3c16b'],['#46264b','#714175'],['#8f3a31','#c45d4a'],['#9b7442','#cfa261'],['#6e4a2c','#94693f']];
+function blob(x,cx,cy,rx,ry,R,ph){x.beginPath();for(let i=0;i<=64;i++){const a=i/64*Math.PI*2;let k=1;for(let j=0;j<4;j++)k+=ph[j][0]*Math.cos((j+2)*a+ph[j][1]);
+  const px=cx+Math.cos(a)*rx*k,py=cy+Math.sin(a)*ry*k;i?x.lineTo(px,py):x.moveTo(px,py)}x.closePath()}
+function drawTile(c,kind,r){const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.fillStyle='#e7dfca';x.fillRect(0,0,W,H);
+  for(let i=0;i<70;i++){x.fillStyle=`rgba(90,62,38,${.05+r()*.12})`;x.fillRect(r()*W,r()*H,1.5,1.5)}
+  const ph=[0,0,0,0].map(()=>[(r()-.5)*.16,r()*6.3]);const cx=W/2+(r()-.5)*10,cy=H/2+(r()-.5)*8+4;
+  const long=r()<.25;const rx=W*(long?.38:.30),ry=H*(long?.18:.24);const ang=(r()-.5)*.9;
+  x.save();x.translate(cx,cy);x.rotate(ang);
+  x.fillStyle='rgba(40,25,10,.22)';blob(x,3,ry*.75,rx,ry*.35,1,ph);x.fill();
+  if(kind==='cauli'){
+    // a cauliflower wearing a potato. florets and one leaf poke out where the coat doesn't reach
+    x.fillStyle='#6f8f45';x.beginPath();x.ellipse(rx*.86,-ry*.5,11,5,-.7,0,7);x.fill();
+    x.strokeStyle='#4f6a2f';x.lineWidth=1;x.beginPath();x.moveTo(rx*.78,-ry*.4);x.lineTo(rx*.95,-ry*.6);x.stroke();
+    const fl=[];for(let i=0;i<8;i++){fl.push([(i/7-.5)*rx*1.05+(r()-.5)*6,-ry*.8-r()*8,7+r()*4])}
+    fl.forEach(f=>{const g=x.createRadialGradient(f[0]-2,f[1]-2,1,f[0],f[1],f[2]);g.addColorStop(0,'#fffdf2');g.addColorStop(1,'#d8d2a8');
+      x.fillStyle=g;x.beginPath();x.arc(f[0],f[1],f[2],0,7);x.fill();x.strokeStyle='rgba(120,110,60,.35)';x.lineWidth=1;x.stroke()});
+    const v=VAR[0];const g=x.createRadialGradient(-rx*.35,-ry*.35,2,0,0,rx*1.15);g.addColorStop(0,v[1]);g.addColorStop(1,v[0]);
+    x.fillStyle=g;blob(x,0,0,rx,ry,1,ph);x.fill();x.strokeStyle='rgba(30,18,8,.35)';x.lineWidth=1;x.stroke();
+    // drawn-on eyes: too neat, perfectly in a row
+    x.fillStyle='#3b2615';for(let i=-1;i<=1;i++){x.beginPath();x.arc(i*rx*.34,ry*.1,2,0,7);x.fill()}
+  } else {
+    const v=VAR[kind];const g=x.createRadialGradient(-rx*.35,-ry*.35,2,0,0,rx*1.15);g.addColorStop(0,v[1]);g.addColorStop(1,v[0]);
+    x.fillStyle=g;blob(x,0,0,rx,ry,1,ph);x.fill();x.strokeStyle='rgba(30,18,8,.35)';x.lineWidth=1;x.stroke();
+    const ne=3+(r()*4|0);for(let i=0;i<ne;i++){const ex=(r()-.5)*rx*1.4,ey=(r()-.5)*ry*1.2;x.strokeStyle='rgba(35,20,8,.55)';x.lineWidth=1.3;
+      x.beginPath();x.arc(ex,ey,2+r()*2,Math.PI*(.1+r()*.3),Math.PI*(.8+r()*.3));x.stroke()}
+    for(let i=0;i<14;i++){x.fillStyle='rgba(40,25,10,.18)';x.fillRect((r()-.5)*rx*1.5,(r()-.5)*ry*1.4,1.2,1.2)}
+  }
+  x.restore()}
+function buildGrid(){const g=$('#grid');g.innerHTML='';const r=rng(capSeed*977+13);cauliIdx=r()*9|0;
+  for(let i=0;i<9;i++){const t=document.createElement('div');t.className='tile';const c=document.createElement('canvas');c.width=110;c.height=110;
+    drawTile(c,i===cauliIdx?'cauli':(r()*VAR.length|0),r);t.appendChild(c);t.onclick=()=>t.classList.toggle('sel');g.appendChild(t)}}
+$('#cbox').onclick=async()=>{if(capOK||$('#cbox').classList.contains('spin'))return;$('#cbox').classList.add('spin');await wait(2300);
+  $('#cbox').classList.remove('spin');buildGrid();$('#chal').style.display='block';$('#capmsg').textContent=''};
+$('#verify').onclick=()=>{const t=$$('#grid .tile');const sel=t.map(e=>e.classList.contains('sel'));
+  if(sel[cauliIdx]){$('#capmsg').textContent='One of those was a cauliflower.';capSeed++;setTimeout(buildGrid,900);return}
+  if(sel.filter((s,i)=>!s&&i!==cauliIdx).length){$('#capmsg').textContent='You missed a potato. It noticed.';return}
+  capOK=true;$('#chal').style.display='none';$('#cbox').className='cbox ok';$('#cbox').textContent='\u2713';$('#caplabel').textContent='You are not a cauliflower'};
+
+/* 6.1 petitioner signature */
+const sig=$('#sig');let sx,sigInk=0,drawing=false,last=null;
+function fitCanvas(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;const x=c.getContext('2d');x.scale(d,d);return x}
+sx=fitCanvas(sig);
+function pt(e){const r=sig.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
+sig.addEventListener('pointerdown',e=>{drawing=true;last=pt(e);sig.setPointerCapture(e.pointerId)});
+sig.addEventListener('pointermove',e=>{if(!drawing)return;const p=pt(e);sx.strokeStyle='#233a78';sx.lineWidth=2.2;sx.lineCap='round';
+  sx.beginPath();sx.moveTo(...last);sx.lineTo(...p);sx.stroke();sigInk+=Math.hypot(p[0]-last[0],p[1]-last[1]);last=p});
+['pointerup','pointercancel'].forEach(t=>sig.addEventListener(t,()=>drawing=false));
+$('#sigclear').onclick=()=>{sx.clearRect(0,0,sig.width,sig.height);sigInk=0};
+
+/* 6.2 the potato witness */
+const wit=$('#wit');let witDone=false,witSig='',held=new Set(),burst=[],capturing=false,loneT=null,borrowing=false;
+const io=new IntersectionObserver(es=>es.forEach(e=>wit.classList.toggle('armed',e.intersectionRatio>.5&&!witDone)),{threshold:[0,.5,1]});io.observe(wit);
+function renderWit(){wit.querySelector('#witmsg').innerHTML='';const s=document.createElement('div');s.className='potsig';s.textContent=witSig;wit.querySelector('#witmsg').appendChild(s)}
+function finishWit(note){witDone=true;capturing=false;wit.classList.remove('armed');
+  const n=document.createElement('div');n.className='hint';n.style.marginTop='6px';n.textContent=note;wit.querySelector('#witmsg').appendChild(n)}
+document.addEventListener('keydown',e=>{
+  if(witDone||borrowing||!wit.classList.contains('armed'))return;
+  const tg=e.target.tagName;if(tg==='INPUT'||tg==='TEXTAREA')return;
+  if(e.key.length!==1)return;
+  e.preventDefault();const now=performance.now();
+  if(capturing){if(witSig.length<26){witSig+=e.key;renderWit()}return}
+  if(!e.repeat)held.add(e.code);burst.push({k:e.key,t:now});burst=burst.filter(b=>now-b.t<180);
+  const distinct=new Set(burst.map(b=>b.k)).size;
+  if(held.size>=3||distinct>=4){clearTimeout(loneT);capturing=true;witSig=[...new Set(burst.map(b=>b.k))].join('');renderWit();
+    setTimeout(()=>finishWit('witnessed.'),650);return}
+  clearTimeout(loneT);loneT=setTimeout(()=>{if(!capturing&&!witDone)$('#witmsg').innerHTML="That's you. We can tell.<br>A potato doesn't press one key at a time."},380)});
+document.addEventListener('keyup',e=>held.delete(e.code));
+wit.addEventListener('touchstart',e=>{if(witDone||borrowing)return;e.preventDefault();
+  if(e.touches.length>=3){const r=wit.getBoundingClientRect();const pc=$('#witprint');const x=fitCanvas(pc);const g=rng(e.touches.length*31+7);
+    for(const t of e.touches){const px=t.clientX-r.left,py=t.clientY-r.top;for(let i=0;i<40;i++){x.fillStyle=`rgba(90,62,38,${.15+g()*.3})`;
+      x.beginPath();x.arc(px+(g()-.5)*30,py+(g()-.5)*22,1+g()*3,0,7);x.fill()}}
+    $('#witmsg').innerHTML='';witSig='(print)';finishWit('witnessed. there is soil on your screen now.')}
+  else $('#witmsg').innerHTML="That's a finger.<br>Flatter. Lumpier."},{passive:false});
+$('#office').onclick=async()=>{if(witDone||borrowing)return;borrowing=true;wit.classList.remove('armed');
+  $('#witmsg').innerHTML='The office potato is on its way.<br>It is slow.';await wait(2600);
+  const s=' ;lk  hgj';witSig='';for(const ch of s){witSig+=ch;renderWit();await wait(700)}
+  finishWit('witnessed by the office potato. it did its best.');borrowing=false};
+
+/* sound */
+let AC=null;function ac(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}return AC}
+function whoosh(){const a=ac();if(!a)return;const d=1.5,b=a.createBuffer(1,a.sampleRate*d,a.sampleRate),ch=b.getChannelData(0);for(let i=0;i<ch.length;i++)ch[i]=Math.random()*2-1;
+  const s=a.createBufferSource();s.buffer=b;const f=a.createBiquadFilter();f.type='bandpass';f.Q.value=2.5;const t=a.currentTime;
+  f.frequency.setValueAtTime(250,t);f.frequency.exponentialRampToValueAtTime(2600,t+.35);f.frequency.exponentialRampToValueAtTime(180,t+d);
+  const g=a.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.35,t+.12);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  s.connect(f).connect(g).connect(a.destination);s.start()}
+function thump(){const a=ac();if(!a)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(42,t+.18);
+  g.gain.setValueAtTime(.6,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.3)}
+
+/* submit */
+function radio(n){return(document.querySelector(`input[name=${n}]:checked`)||{}).value}
+$('#send').onclick=async()=>{
+  const E=[];
+  if(!$('#name').value.trim())E.push("1.1 is empty. He needs something to call you.");
+  if(!$('#a2').checked)E.push("4.2: please acknowledge the vestments.");
+  if(!$('#a1').checked||!$('#a3').checked)E.push("Section 4 needs every box.");
+  if(!capOK)E.push("5.1: we still don't know you're not a cauliflower.");
+  if(sigInk<25)E.push("6.1 is unsigned.");
+  if(!witDone)E.push("6.2 has not been witnessed by a potato.");
+  $('#errs').innerHTML=E.join('<br>');
+  if(E.length)return;
+  ac();
+  $('#form').style.transition='opacity 1s';$('#form').style.opacity='.35';$('#send').disabled=true;
+  const T=$('#tube');T.style.display='block';T.scrollIntoView({behavior:'smooth',block:'center'});
+  const lines=['folded in three.','sent down tube 6.','received in the mycelial network office.','stamped.','stamped again. the first one was crooked.',
+    'carried down to the lower burrow.','sacred spudbert is reading it.','with his whiskers.','he is on section 3.','...'];
+  for(const [i,l] of lines.entries()){await wait(i===9?2000:i===1?1500:950);const d=document.createElement('div');d.textContent=l;T.appendChild(d);if(i===1)whoosh();if(i===3||i===4)thump()}
+  await wait(1800);
+  $('#form').style.display='none';T.style.display='none';showCovenant()};
+
+const REASON={field:'the blessing of a field',small:'the blessing of a smaller thing',
+  people:'a dispute between two people who both think they are right, which is the worst kind',
+  potatoes:'a dispute between two potatoes. He will hear both sides. It will take a while',
+  lost:'a thing lost underground. He cannot promise anything. He will look',
+  link:'a petitioner who does not know who the Gopher is. He does not mind. Most people don\'t'};
+const CAULI={no:'The Petitioner has never been a cauliflower.',nk:'The Petitioner has not knowingly been a cauliflower. The Gopher accepts this, for now.',
+  turnip:'The Petitioner asked to speak to a turnip. There are no turnips down here. There have never been turnips.'};
+function el(tag,html){const e=document.createElement(tag);e.innerHTML=html;return e}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+async function showCovenant(){
+  const C=$('#cov');C.style.display='block';window.scrollTo(0,0);
+  const now=new Date(),M=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const no=String(10000+Math.floor(Math.random()*89999));$('#cno').textContent='No. '+no+' \u00b7 made underground on the '+now.getDate()+(['th','st','nd','rd'][(now.getDate()%10>3||[11,12,13].includes(now.getDate()))?0:now.getDate()%10])+' of '+M[now.getMonth()];
+  const name=esc($('#name').value.trim()),alias=esc($('#alias').value.trim());
+  $('#parties').innerHTML=`Between <b>SACRED SPUDBERT</b>, gopher, tenured ("the Gopher"), and <span class="pen">${name}</span> ("the Petitioner"), `+
+    (alias?`known to the potatoes as <span class="pen">${alias}</span>.`:'known to the potatoes by a name they did not share.');
+  const kg=Math.max(0,+$('#kg').value||0),txt=esc($('#breath').value.trim());const kgs=(Math.round(kg*100)/100).toLocaleString('en');
+  const cl=[`The Gopher will surface once, on the matter of ${REASON[radio('why')]}.`,
+    txt?`In one breath, the Petitioner said: <span class="pen">\u201c${txt}\u201d</span>`:'The Petitioner said nothing in one breath, which the Gopher respects.',
+    `The Petitioner will provide <span class="pen">${kgs}</span> kg of compost, one (1) raw potato, unwashed, and silence.`+(kg<=0?' The Gopher read this clause for some time.':''),
+    'Neither party will mention the other gopher.',CAULI[radio('cauli')],
+    'All of this by spring'+(+$('#urg').value>60?', and the Petitioner will be upset.':'.')];
+  const ol=$('#clauses');ol.innerHTML='';cl.forEach(c=>ol.appendChild(el('li',c)));
+  const im=new Image();im.src=sig.toDataURL();$('#cs1').innerHTML='';$('#cs1').appendChild(im);
+  if(witSig==='(print)'){const i2=new Image();i2.src=$('#witprint').toDataURL();$('#cs2').innerHTML='';$('#cs2').appendChild(i2)}
+  else{$('#cs2').innerHTML='';const s=document.createElement('div');s.className='potsig';s.style.fontSize='24px';s.textContent=witSig;$('#cs2').appendChild(s)}
+  $('#cs3').innerHTML='<svg width="60" height="56" viewBox="0 0 60 56"><g fill="#5a3e26" opacity=".85"><ellipse cx="30" cy="36" rx="12" ry="10"/><ellipse cx="14" cy="20" rx="4.5" ry="6" transform="rotate(-20 14 20)"/><ellipse cx="24" cy="12" rx="4.5" ry="6.5"/><ellipse cx="36" cy="12" rx="4.5" ry="6.5"/><ellipse cx="46" cy="20" rx="4.5" ry="6" transform="rotate(20 46 20)"/></g></svg>';
+  await wait(900);$('#stamp').classList.add('down');thump();
+  $('#o_rec').textContent=now.getDate()+'/'+(now.getMonth()+1);$('#o_tube').textContent='6';
+  await wait(1600);$('#burrow').scrollIntoView({behavior:'smooth',block:'center'});await wait(900);runGopher()}
+
+/* the burrow */
+const B=$('#burrow');const BW=560,BH=240;let bx;
+function fitB(){const d=window.devicePixelRatio||1;B.width=BW*d;B.height=BH*d;bx=B.getContext('2d');bx.setTransform(d,0,0,d,0,0)}
+fitB();
+const HX=280,HY=172;const crumbs=[];const cr=rng(42);
+const moundPh=[0,0,0].map(()=>[(cr()-.5)*.05,cr()*6]);
+function mound(x){x.fillStyle='#6b4a2e';x.beginPath();x.moveTo(30,BH);
+  for(let i=0;i<=80;i++){const u=i/80,px=30+u*500;const base=BH-(BH-HY+6)*Math.pow(Math.sin(Math.PI*u),1.6);let w=0;moundPh.forEach((p,j)=>w+=p[0]*Math.sin((j+3)*Math.PI*u*2+p[1]));x.lineTo(px,base+w*40)}
+  x.lineTo(530,BH);x.closePath();x.fill();
+  const g=rng(5);for(let i=0;i<260;i++){const u=g(),px=30+u*500,top=BH-(BH-HY+6)*Math.pow(Math.sin(Math.PI*u),1.6);const py=top+6+g()*(BH-top);
+    x.fillStyle=g()<.5?'rgba(40,25,12,.35)':'rgba(160,120,80,.25)';x.fillRect(px,py,1.6,1.6)}}
+function holeBack(x){x.fillStyle='#24170c';x.beginPath();x.ellipse(HX,HY,40,10,0,0,7);x.fill()}
+function holeFront(x){x.fillStyle='#6b4a2e';x.beginPath();x.ellipse(HX,HY+2,44,8,0,0,Math.PI);x.lineTo(HX-44,HY+14);x.lineTo(HX+44,HY+14);x.closePath();x.fill();
+  x.strokeStyle='rgba(30,18,8,.4)';x.lineWidth=1;x.beginPath();x.ellipse(HX,HY+1,41,8,0,0,Math.PI);x.stroke()}
+function mitre(x,b){const X=HX;x.fillStyle='#f6f1e3';x.strokeStyle='#b8902c';x.lineWidth=2;
+  x.beginPath();x.moveTo(X-25,b+80);x.lineTo(X-23,b+34);x.quadraticCurveTo(X-17,b+10,X,b);x.quadraticCurveTo(X+17,b+10,X+23,b+34);x.lineTo(X+25,b+80);x.closePath();x.fill();x.stroke();
+  x.fillStyle='#c9a033';x.fillRect(X-4,b+8,8,72);x.fillRect(X-24,b+64,48,8);x.fillRect(X-10,b+28,20,5);
+  x.fillStyle='#a3301d';x.beginPath();x.arc(X,b+68,2.6,0,7);x.fill()}
+function gopherHead(x,b,blink,look){const X=HX,cy=b+96;
+  x.fillStyle='#7a5434';x.beginPath();x.ellipse(X-27,cy-14,7,8,0,0,7);x.ellipse(X+27,cy-14,7,8,0,0,7);x.fill();
+  x.fillStyle='#8a6140';x.beginPath();x.ellipse(X,cy,32,26,0,0,7);x.fill();
+  x.fillStyle='#d9b48c';x.beginPath();x.ellipse(X-27,cy-14,3.5,4,0,0,7);x.ellipse(X+27,cy-14,3.5,4,0,0,7);x.fill();
+  mitre(x,b);
+  const ey=cy-4;for(const s of[-1,1]){const ex=X+s*12;
+    if(blink){x.strokeStyle='#1a120a';x.lineWidth=2;x.beginPath();x.moveTo(ex-4.5,ey);x.lineTo(ex+4.5,ey);x.stroke()}
+    else{x.fillStyle='#120c07';x.beginPath();x.arc(ex,ey,5,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(ex-1.6+look*1.4,ey-1.8,1.5,0,7);x.fill()}}}
+function drawGopher(t){const x=bx;x.clearRect(0,0,BW,BH);mound(x);holeBack(x);
+  let rise=0;const FULL=104;
+  if(t>2.6&&t<5.8)rise=FULL*(1-Math.pow(1-(t-2.6)/3.2,2.2));else if(t>=5.8&&t<9.2)rise=FULL;else if(t>=9.2&&t<9.75)rise=FULL*(1-Math.pow((t-9.2)/.55,1.6));
+  const b=HY-rise;
+  if(rise>0){x.save();x.beginPath();x.rect(0,0,BW,HY);x.ellipse(HX,HY,39,9.5,0,0,7);x.clip();gopherHead(x,b,(t>7.3&&t<7.48),t>6.2?1:-1);x.restore()}
+  holeFront(x);
+  const shaking=(t>1.3&&t<2.6)||(t>9.1&&t<9.9);
+  if(shaking&&cr()<.5)crumbs.push({x:HX+(cr()-.5)*80,y:HY-2,vx:(cr()-.5)*1.6,vy:-1.5-cr()*1.6,l:1});
+  for(const c of crumbs){c.x+=c.vx;c.vy+=.18;c.y+=c.vy;if(c.y>HY+12+cr()*20){c.vy=0;c.vx*=.5;c.y=Math.min(c.y,HY+30)}c.l-=.006;
+    x.fillStyle=`rgba(70,46,26,${Math.max(0,c.l)})`;x.fillRect(c.x,c.y,2.2,2.2)}
+  for(let i=crumbs.length-1;i>=0;i--)if(crumbs[i].l<=0)crumbs.splice(i,1)}
+window.__drawGopher=drawGopher;drawGopher(0);
+function runGopher(){const t0=performance.now();let said=false;
+  (function f(){const t=(performance.now()-t0)/1000/FAST;drawGopher(t);
+    if(t>10.6&&!said){said=true;$('#after').innerHTML='He looked at you and went back down.<br><span style="font-size:14px">(See 4.3.)</span>';$('#o_mood').textContent='fine';
+      setTimeout(()=>$('#again').style.display='block',2500*FAST)}
+    if(t<14)requestAnimationFrame(f)})()}
+
+window.__test={fill(){ $('#name').value='Test Petitioner';$('#a1').checked=$('#a2').checked=$('#a3').checked=true;capOK=true;sigInk=99;
+  sx.strokeStyle='#233a78';sx.lineWidth=2.2;sx.beginPath();sx.moveTo(20,70);sx.bezierCurveTo(60,10,90,100,140,40);sx.bezierCurveTo(170,20,200,80,250,50);sx.stroke()},
+  cauliIdx:()=>cauliIdx, witSig:()=>witSig};
+})();
+</script>
+</body>
+</html>
