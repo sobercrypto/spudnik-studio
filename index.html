@@ -208,6 +208,9 @@ a{color:var(--warm);}
    words and a dust sheet on the floor until i come down and unpack it.
    ==================================================================== */
 const MINE = {
+  15:{fold:14},
+  14:{title:"the front door", prop:"doormat", what:"page", also:[[15,"the morning safari couldn't get in, and how i let it in"]],
+      line:"this page. you've just come down it. the dirt was painted in your browser as you arrived, and the spare key's where you'd expect."},
   13:{title:"the cellar portraits, no. 1: paul", prop:"easel", what:"picture",
       line:"paul at the bottom of the tunnel, holding a lantern up on his own ghost sprout for whoever's coming down next."},
   12:{title:"form SPB-1", prop:"molehill", what:"page",
@@ -918,6 +921,16 @@ const PROPS = {
     {k:'line', pts:[[-10,-34],[-11,-4]], w:1.4, c:[250,252,252], a:.5},
   ]},
   // a room that came down while i was out: its things are under a dust sheet
+  doormat:{ at:.12, sw:44, layers:[
+    {s:poly([[-40,0],[40,0],[34,-10],[-34,-10]]), c:[150,104,56], d:V},
+    {s:poly([[-33,-2],[33,-2],[29,-8],[-29,-8]]), c:[178,132,74], d:V, L:2.5, w:1.2},
+  ], details:[
+    {k:'line', pts:[[-22,-5],[22,-5]], w:.8, c:[120,80,40], a:.5},
+    {k:'line', pts:[[30,-3],[39,-3]], w:1.6, c:[210,172,92], a:.95},
+    {k:'dot', x:28, y:-3, r:2.2, c:[214,178,98]},
+    {k:'dot', x:28, y:-3, r:.8, c:[60,40,20]},
+    {k:'line', pts:[[36,-3],[36,-1]], w:1, c:[210,172,92], a:.9},
+  ]},
   sheet:{ sw:46, layers:[
     {s:poly([[-30,0],[-27,0],[-26,-8],[-29,-8]]), c:[120,84,50], d:V},
     {s:shp([-40,-58,40,-4],p=>{p.moveTo(-40,-6);p.quadraticCurveTo(-42,-36,-22,-50);p.quadraticCurveTo(-6,-60,8,-50);
