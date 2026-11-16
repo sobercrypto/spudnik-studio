@@ -17,7 +17,7 @@ body{
   font-size:18px; line-height:1.6; overflow-x:hidden; overflow-x:clip; position:relative;
   -webkit-font-smoothing:antialiased;
 }
-#soil{position:absolute; left:0; top:0; z-index:-1; display:block; pointer-events:none;}
+#soil{position:absolute; left:0; top:0; z-index:-1; display:block; pointer-events:none; overflow:hidden;}
 main{position:relative; max-width:1000px; margin:0 auto; padding:0 18px;}
 a{color:var(--warm);}
 .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);}
@@ -141,7 +141,7 @@ a{color:var(--warm);}
 </style>
 </head>
 <body>
-<canvas id="soil" aria-hidden="true"></canvas>
+<div id="soil" aria-hidden="true"></div>
 <main>
   <section class="surface" id="top">
     <h1 class="sr">spudnik's studio</h1>
@@ -469,14 +469,87 @@ window.addEventListener('scroll',gaugeUpdate,{passive:true}); gaugeUpdate();
    THE DIRT. painted fresh by this page every time it loads.
    the rooms decide where they are; the painter digs around them.
    ==================================================================== */
-const cv=document.getElementById('soil'), g=cv.getContext('2d');
+/* ---------- the dirt comes in slabs ----------
+   safari won't draw on a canvas bigger than 16,777,216 pixels (a 4096 square),
+   and on some versions it just quietly draws nothing. a long dig on a sharp
+   screen goes over that. so the soil is a stack of short canvases, and this
+   little foreman takes every brush stroke and hands it only to the slabs it
+   actually touches. the painter below never has to know. */
+function Slabs(holder){
+  this.holder=holder; this.tiles=[]; this.M=[1,0,0,1,0,0]; this.stack=[]; this.ops=[]; this.y0=1e18; this.y1=-1e18;
+  this.st={}; this.lw=1;
+}
+Slabs.prototype.size=function(W,H,dpr){
+  // css px per slab: a multiple of 4, so slab edges land on whole device pixels at dpr 1/1.25/1.5
+  const band=Math.max(256, Math.floor(Math.min(3600/dpr, 6e6/(W*dpr*dpr))/4)*4);
+  const n=Math.ceil(H/band);
+  this.holder.style.width=W+'px'; this.holder.style.height=H+'px';
+  while(this.tiles.length>n){ const t=this.tiles.pop(); t.c.width=t.c.height=0; t.c.remove(); } // give the memory back, safari hoards it
+  for(let i=0;i<n;i++){
+    let t=this.tiles[i];
+    if(!t){ const c=document.createElement('canvas'); this.holder.appendChild(c); t=this.tiles[i]={c, x:c.getContext('2d')}; }
+    const h=Math.min(band, H-i*band);
+    t.c.width=Math.round(W*dpr); t.c.height=Math.round(h*dpr);
+    t.c.style.cssText=`position:absolute;left:0;top:${i*band}px;width:${W}px;height:${h}px;display:block`;
+    t.off=Math.round(i*band*dpr); t.y0=t.off; t.y1=t.off+t.c.height;
+  }
+  this.M=[1,0,0,1,0,0]; this.stack=[]; this.ops=[]; this.st={};
+};
+// ---- transforms, tracked here and copied to every slab, shifted up by its offset
+Slabs.prototype._apply=function(){ const m=this.M; for(const t of this.tiles) t.x.setTransform(m[0],m[1],m[2],m[3],m[4],m[5]-t.off); };
+Slabs.prototype.setTransform=function(a,b,c,d,e,f){ this.M=[a,b,c,d,e,f]; this._apply(); };
+Slabs.prototype.translate=function(x,y){ const m=this.M; m[4]+=m[0]*x+m[2]*y; m[5]+=m[1]*x+m[3]*y; this._apply(); };
+Slabs.prototype.scale=function(sx,sy){ const m=this.M; m[0]*=sx; m[1]*=sx; m[2]*=sy; m[3]*=sy; this._apply(); };
+Slabs.prototype.save=function(){ this.stack.push([this.M.slice(), Object.assign({},this.st), this.lw]); for(const t of this.tiles) t.x.save(); };
+Slabs.prototype.restore=function(){ const s=this.stack.pop(); if(s){ this.M=s[0]; this.st=s[1]; this.lw=s[2]; } for(const t of this.tiles) t.x.restore(); };
+Slabs.prototype._k=function(){ const m=this.M; return Math.max(Math.abs(m[0])+Math.abs(m[2]), Math.abs(m[1])+Math.abs(m[3])); };
+Slabs.prototype._grow=function(x,y,r){ const m=this.M, yd=m[1]*x+m[3]*y+m[5], rr=(r||0)*this._k(); if(yd-rr<this.y0) this.y0=yd-rr; if(yd+rr>this.y1) this.y1=yd+rr; };
+// ---- the current path is written down, and only read out to the slabs that need it
+Slabs.prototype.beginPath=function(){ this.ops.length=0; this.y0=1e18; this.y1=-1e18; };
+Slabs.prototype.moveTo=function(x,y){ this.ops.push(['moveTo',[x,y]]); this._grow(x,y); };
+Slabs.prototype.lineTo=function(x,y){ this.ops.push(['lineTo',[x,y]]); this._grow(x,y); };
+Slabs.prototype.quadraticCurveTo=function(a,b,x,y){ this.ops.push(['quadraticCurveTo',[a,b,x,y]]); this._grow(a,b); this._grow(x,y); };
+Slabs.prototype.arc=function(x,y,r,a0,a1,ccw){ this.ops.push(['arc',[x,y,r,a0,a1,!!ccw]]); this._grow(x,y,r); };
+Slabs.prototype.ellipse=function(x,y,rx,ry,rot,a0,a1,ccw){ this.ops.push(['ellipse',[x,y,rx,ry,rot,a0,a1,!!ccw]]); this._grow(x,y,Math.max(rx,ry)); };
+Slabs.prototype._hit=function(y0,y1){ return this.tiles.filter(t=>y1>=t.y0 && y0<=t.y1); };
+Slabs.prototype._draw=function(how, arg){
+  if(arg instanceof Path2D){ for(const t of this.tiles) t.x[how](arg); return; } // a whole shape: everyone gets it
+  const pad=(how==='stroke'? this.lw*this._k()/2 : 0)+2;
+  for(const t of this._hit(this.y0-pad, this.y1+pad)){
+    t.x.beginPath(); for(const [f,a] of this.ops) t.x[f](...a); t.x[how]();
+  }
+};
+Slabs.prototype.stroke=function(p){ this._draw('stroke',p); };
+Slabs.prototype.fill=function(p){ this._draw('fill',p); };
+Slabs.prototype.clip=function(p){ if(p instanceof Path2D){ for(const t of this.tiles) t.x.clip(p); } else for(const t of this.tiles){ t.x.beginPath(); for(const [f,a] of this.ops) t.x[f](...a); t.x.clip(); } };
+Slabs.prototype.fillRect=function(x,y,w,h){
+  const m=this.M, ys=[[x,y],[x+w,y],[x,y+h],[x+w,y+h]].map(([px,py])=>m[1]*px+m[3]*py+m[5]);
+  for(const t of this._hit(Math.min(...ys)-1, Math.max(...ys)+1)) t.x.fillRect(x,y,w,h);
+};
+// asking whether a point's inside a shape is pure geometry, so the top slab can answer for all of them
+Slabs.prototype.isPointInPath=function(p,x,y){ return this.tiles[0].x.isPointInPath(p,x,y); };
+// gradients: written down, and made fresh for each slab when they're used
+Slabs.prototype.createRadialGradient=function(...a){ return {kind:'createRadialGradient', a, stops:[], addColorStop(o,c){ this.stops.push([o,c]); }}; };
+Slabs.prototype.createLinearGradient=function(...a){ return {kind:'createLinearGradient', a, stops:[], addColorStop(o,c){ this.stops.push([o,c]); }}; };
+for (const k of ['strokeStyle','fillStyle','lineWidth','lineCap','lineJoin','globalAlpha','globalCompositeOperation']){
+  Object.defineProperty(Slabs.prototype, k, {
+    get(){ return this.st[k]; },
+    set(v){ this.st[k]=v; if(k==='lineWidth') this.lw=v;
+      for(const t of this.tiles){
+        if(v && v.stops){ const gr=t.x[v.kind](...v.a); for(const [o,c] of v.stops) gr.addColorStop(o,c); t.x[k]=gr; }
+        else t.x[k]=v; } }
+  });
+}
+
+const g=new Slabs(document.getElementById('soil'));
 let paintJob=0;
 function paint(){
   const job=++paintJob;
   const W=document.documentElement.clientWidth, H=document.documentElement.scrollHeight;
-  const dpr=Math.min(window.devicePixelRatio||1, 1.5);
-  cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
-  cv.style.width=W+'px'; cv.style.height=H+'px';
+  // sharp enough, in quarter steps, and never wider than safari will draw
+  let dpr=Math.min(window.devicePixelRatio||1, 1.5, 3600/W);
+  dpr=Math.max(.5, Math.floor(dpr*4)/4);
+  g.size(W,H,dpr);
   g.setTransform(dpr,0,0,dpr,0,0);
 
   const surf=document.querySelector('.surface');
